@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Plane Animation</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Load scripts in order - each adds to PlaneAnimation namespace -->
+  <script src="js/utils.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/main.js"></script>
+</head>
+<body>
+  <!-- Toggle Button -->
+  <button id="toggle-controls" class="toggle-button">›</button>
+
+  <!-- Controls Panel -->
+  <div id="controls-panel" class="controls-panel">
+    <h2>Animation Controls</h2>
+
+    <!-- Basic Settings -->
+    <div class="settings-section">
+      <h3>Basic Settings</h3>
+
+      <label class="control-label">Aspect Ratio</label>
+      <select id="aspect-ratio">
+        <option value="16:9">16:9 (Widescreen)</option>
+        <option value="4:3" selected>4:3 (Standard)</option>
+        <option value="1:1">1:1 (Square)</option>
+        <option value="3:4">3:4 (Portrait)</option>
+        <option value="9:16">9:16 (Vertical)</option>
+      </select>
+
+      <label class="control-label">Number of Planes</label>
+      <input type="number" id="num-planes" min="1" max="20" value="5">
+
+      <label class="control-label">Plane Colors & Opacity</label>
+      <div id="plane-colors-container"></div>
+    </div>
+
+    <!-- Start Settings -->
+    <div class="settings-section">
+      <h3>Start State Settings</h3>
+
+      <div id="start-position-grid" class="position-grid-container"></div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="start-stacked" checked>
+        Start Stacked
+      </label>
+
+      <div id="start-stacked-options">
+        <label class="control-label">Start Stack Gap: <span id="stack-gap-value">25</span>px</label>
+        <div class="helper-text">Distance between stacked planes</div>
+        <input type="range" id="stack-gap" min="0" max="50" value="25">
+
+        <label class="control-label">Start Stack Rotation X: <span id="start-rotation-x-value">45</span>°</label>
+        <input type="range" id="start-rotation-x" min="-180" max="180" value="45">
+
+        <label class="control-label">Start Stack Rotation Y: <span id="start-rotation-y-value">0</span>°</label>
+        <input type="range" id="start-rotation-y" min="-180" max="180" value="0">
+
+        <label class="control-label">Start Stack Rotation Z: <span id="start-rotation-z-value">45</span>°</label>
+        <input type="range" id="start-rotation-z" min="-180" max="180" value="45">
+      </div>
+
+      <div id="start-unstacked-options" style="display: none;">
+        <label class="control-label">Start Spread: <span id="start-spread-value">50</span>%</label>
+        <div class="helper-text">How far apart planes are scattered within region</div>
+        <input type="range" id="start-spread" min="0" max="100" value="50">
+
+        <label class="control-label">Start Initial Rotation: <span id="start-rotation-amount-value">0</span>%</label>
+        <div class="helper-text">How much each plane is randomly rotated at start</div>
+        <input type="range" id="start-rotation-amount" min="0" max="100" value="0">
+
+        <button id="randomize-start" class="primary-button">Randomize Within Region</button>
+      </div>
+    </div>
+
+    <!-- End Settings -->
+    <div class="settings-section">
+      <h3>End State Settings</h3>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="return-to-start">
+        Return to Start
+      </label>
+
+      <div id="end-options">
+        <div id="end-position-grid" class="position-grid-container"></div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="end-stacked" checked>
+          End Stacked
+        </label>
+
+        <div id="end-stacked-options">
+          <label class="control-label">End Stack Gap: <span id="end-stack-gap-value">25</span>px</label>
+          <div class="helper-text">Distance between stacked planes at end</div>
+          <input type="range" id="end-stack-gap" min="0" max="50" value="25">
+
+          <label class="control-label">End Stack Rotation X: <span id="end-rotation-x-value">45</span>°</label>
+          <input type="range" id="end-rotation-x" min="-180" max="180" value="45">
+
+          <label class="control-label">End Stack Rotation Y: <span id="end-rotation-y-value">0</span>°</label>
+          <input type="range" id="end-rotation-y" min="-180" max="180" value="0">
+
+          <label class="control-label">End Stack Rotation Z: <span id="end-rotation-z-value">45</span>°</label>
+          <input type="range" id="end-rotation-z" min="-180" max="180" value="45">
+        </div>
+
+        <div id="end-unstacked-options" style="display: none;">
+          <label class="control-label">End Spread: <span id="end-spread-value">50</span>%</label>
+          <div class="helper-text">How far apart planes are scattered within end region</div>
+          <input type="range" id="end-spread" min="0" max="100" value="50">
+
+          <label class="control-label">End Initial Rotation: <span id="end-rotation-amount-value">0</span>%</label>
+          <div class="helper-text">How much each plane is randomly rotated at end</div>
+          <input type="range" id="end-rotation-amount" min="0" max="100" value="0">
+
+          <button id="randomize-end" class="primary-button">Randomize Within Region</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movement & Rotation Settings -->
+    <div class="settings-section">
+      <h3>Movement & Rotation Settings</h3>
+
+      <label class="control-label">Positional Variation: <span id="positional-variation-value">100</span>%</label>
+      <div class="helper-text" id="positional-variation-helper">How much planes spread apart during journey</div>
+      <input type="range" id="positional-variation" min="0" max="150" value="100">
+
+      <label class="control-label">Rotation Variation: <span id="rotation-variation-value">50</span>%</label>
+      <div class="helper-text">How much planes rotate during journey</div>
+      <input type="range" id="rotation-variation" min="0" max="100" value="50">
+
+      <label class="control-label">Rotation Mode</label>
+      <select id="rotation-mode">
+        <option value="different">Each plane rotates differently</option>
+        <option value="synchronized">All planes rotate synchronized</option>
+      </select>
+    </div>
+
+    <!-- Playback Settings -->
+    <div class="settings-section">
+      <h3>Playback Settings</h3>
+
+      <label class="control-label">Playback Mode</label>
+      <select id="playback-mode">
+        <option value="back-and-forth">Repeat (back and forth)</option>
+        <option value="loop">Repeat (loop)</option>
+        <option value="once">Don't repeat</option>
+      </select>
+
+      <label class="control-label">Animation Duration: <span id="animation-speed-value">5</span>s</label>
+      <div class="helper-text">How long the animation takes to complete</div>
+      <input type="range" id="animation-speed" min="1" max="20" value="5" style="direction: rtl;">
+    </div>
+
+    <!-- Export Settings -->
+    <div class="settings-section no-border">
+      <h3>Export Settings</h3>
+
+      <div class="export-subsection">
+        <h4>Export Animation</h4>
+
+        <label class="control-label">Animation Quality</label>
+        <div class="helper-text">Higher quality = smoother animation, larger file</div>
+        <select id="export-quality">
+          <option value="low">Low (25 frames)</option>
+          <option value="medium" selected>Medium (50 frames)</option>
+          <option value="high">High (100 frames)</option>
+        </select>
+
+        <button id="export-html" class="primary-button">Export as HTML</button>
+      </div>
+
+      <div class="export-subsection no-border">
+        <h4>Export Static Image</h4>
+
+        <label class="control-label">Image Resolution</label>
+        <div class="helper-text">Higher resolution = better quality, larger file</div>
+        <select id="export-resolution">
+          <option value="1x">1× Standard</option>
+          <option value="2x" selected>2× High (recommended)</option>
+          <option value="3x">3× Print Quality</option>
+          <option value="4x">4× Maximum</option>
+        </select>
+
+        <button id="export-png" class="primary-button">Export Current Frame (PNG)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Animation View -->
+  <div id="perspective-container" class="perspective-container">
+    <div id="animation-container" class="animation-container">
+      <div id="stack-rotation-wrapper" class="stack-rotation-wrapper">
+        <!-- Planes will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Playback Controls -->
+  <div id="playback-controls" class="playback-controls">
+    <button id="play-pause" class="primary-button">Play</button>
+    <input type="range" id="progress-slider" min="0" max="1" step="0.001" value="0">
+    <span id="progress-value" class="progress-value">0%</span>
+  </div>
+</body>
+</html>
