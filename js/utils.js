@@ -1,10 +1,10 @@
 /**
- * Utility functions for the plane animation
+ * Utility functions for the shard animation
  */
 
-var PlaneAnimation = window.PlaneAnimation || {};
+var ShardAnimation = window.ShardAnimation || {};
 
-PlaneAnimation.Utils = (function() {
+ShardAnimation.Utils = (function() {
 
   /**
    * Seeded random number generator
@@ -42,17 +42,17 @@ PlaneAnimation.Utils = (function() {
   }
 
   /**
-   * Generate plane targets for animation based on random seed
+   * Generate shard targets for animation based on random seed
    */
-  function generatePlaneTargets(state) {
-    var numPlanes = state.numPlanes;
+  function generateShardTargets(state) {
+    var numShards = state.numShards;
     var randomSeed = state.randomSeed;
     var rotationVariation = state.rotationVariation;
     var rotationMode = state.rotationMode;
     var positionalVariation = state.positionalVariation;
 
     var targets = [];
-    for (var i = 0; i < numPlanes; i++) {
+    for (var i = 0; i < numShards; i++) {
       targets.push({
         randomOffset: {
           x: (seededRandom(randomSeed + i * 3) - 0.5) * 200,
@@ -164,7 +164,7 @@ PlaneAnimation.Utils = (function() {
   return {
     seededRandom: seededRandom,
     getPositionCoords: getPositionCoords,
-    generatePlaneTargets: generatePlaneTargets,
+    generateShardTargets: generateShardTargets,
     calculateContainerDimensions: calculateContainerDimensions,
     pxToPercent: pxToPercent,
     downloadFile: downloadFile,

@@ -1,20 +1,20 @@
 /**
- * Animation logic for the plane animation
+ * Animation logic for the shard animation
  */
 
-var PlaneAnimation = window.PlaneAnimation || {};
+var ShardAnimation = window.ShardAnimation || {};
 
-PlaneAnimation.Animation = (function() {
-  var Utils = PlaneAnimation.Utils;
+ShardAnimation.Animation = (function() {
+  var Utils = ShardAnimation.Utils;
 
   var animationFrameId = null;
   var lastTime = null;
 
   /**
-   * Get the state of a plane at a given progress value
+   * Get the state of a shard at a given progress value
    */
-  function getStateAtProgress(t, planeIndex, state, planeTargets) {
-    var target = planeTargets[planeIndex];
+  function getStateAtProgress(t, shardIndex, state, shardTargets) {
+    var target = shardTargets[shardIndex];
     var startStacked = state.startStacked;
     var endStacked = state.endStacked;
     var returnToStart = state.returnToStart;
@@ -28,8 +28,8 @@ PlaneAnimation.Animation = (function() {
     var endPosition = state.endPosition;
     var containerDimensions = state.containerDimensions;
 
-    var startStackOffset = startStacked ? planeIndex * stackGap : 0;
-    var endStackOffset = endStacked ? planeIndex * endStackGap : 0;
+    var startStackOffset = startStacked ? shardIndex * stackGap : 0;
+    var endStackOffset = endStacked ? shardIndex * endStackGap : 0;
 
     var stackStartPos;
     if (startStacked) {
@@ -115,7 +115,7 @@ PlaneAnimation.Animation = (function() {
    * Calculate stack rotation wrapper transform
    */
   function getStackWrapperTransform(progress, state) {
-    var numPlanes = state.numPlanes;
+    var numShards = state.numShards;
     var startStacked = state.startStacked;
     var endStacked = state.endStacked;
     var returnToStart = state.returnToStart;
@@ -133,10 +133,10 @@ PlaneAnimation.Animation = (function() {
 
     var centerZ = 0;
     if (returnToStart) {
-      centerZ = startStacked ? (numPlanes - 1) * stackGap / 2 : 0;
+      centerZ = startStacked ? (numShards - 1) * stackGap / 2 : 0;
     } else {
-      var startCenterZ = startStacked ? (numPlanes - 1) * stackGap / 2 : 0;
-      var endCenterZ = endStacked ? (numPlanes - 1) * endStackGap / 2 : 0;
+      var startCenterZ = startStacked ? (numShards - 1) * stackGap / 2 : 0;
+      var endCenterZ = endStacked ? (numShards - 1) * endStackGap / 2 : 0;
       centerZ = startCenterZ + (endCenterZ - startCenterZ) * progress;
     }
 
@@ -174,38 +174,38 @@ PlaneAnimation.Animation = (function() {
   /**
    * Update the animation display
    */
-  function updateAnimationDisplay(state, planeTargets, planeElements, wrapperElement) {
+  function updateAnimationDisplay(state, shardTargets, shardElements, wrapperElement) {
     var progress = state.progress;
     var containerDimensions = state.containerDimensions;
-    var planeSize = containerDimensions.width * 0.1875;
+    var shardSize = containerDimensions.width * 0.1875;
 
     var wrapperTransform = getStackWrapperTransform(progress, state);
     wrapperElement.style.transform = wrapperTransform.transform;
     wrapperElement.style.transformOrigin = wrapperTransform.transformOrigin;
 
-    for (var index = 0; index < planeElements.length; index++) {
-      var planeEl = planeElements[index];
-      if (index >= state.numPlanes) {
-        planeEl.style.display = 'none';
+    for (var index = 0; index < shardElements.length; index++) {
+      var shardEl = shardElements[index];
+      if (index >= state.numShards) {
+        shardEl.style.display = 'none';
         continue;
       }
 
-      planeEl.style.display = 'block';
-      planeEl.style.width = planeSize + 'px';
-      planeEl.style.height = planeSize + 'px';
-      planeEl.style.marginLeft = (-planeSize / 2) + 'px';
-      planeEl.style.marginTop = (-planeSize / 2) + 'px';
-      planeEl.style.background = state.planeColors[index];
-      planeEl.style.opacity = state.planeOpacities[index];
+      shardEl.style.display = 'block';
+      shardEl.style.width = shardSize + 'px';
+      shardEl.style.height = shardSize + 'px';
+      shardEl.style.marginLeft = (-shardSize / 2) + 'px';
+      shardEl.style.marginTop = (-shardSize / 2) + 'px';
+      shardEl.style.background = state.shardColors[index];
+      shardEl.style.opacity = state.shardOpacities[index];
 
-      var planeState = getStateAtProgress(progress, index, state, planeTargets);
-      planeEl.style.transform =
-        'translateX(' + planeState.pos.x + 'px) ' +
-        'translateY(' + planeState.pos.y + 'px) ' +
-        'translateZ(' + planeState.pos.z + 'px) ' +
-        'rotateX(' + planeState.rot.x + 'deg) ' +
-        'rotateY(' + planeState.rot.y + 'deg) ' +
-        'rotateZ(' + planeState.rot.z + 'deg)';
+      var shardState = getStateAtProgress(progress, index, state, shardTargets);
+      shardEl.style.transform =
+        'translateX(' + shardState.pos.x + 'px) ' +
+        'translateY(' + shardState.pos.y + 'px) ' +
+        'translateZ(' + shardState.pos.z + 'px) ' +
+        'rotateX(' + shardState.rot.x + 'deg) ' +
+        'rotateY(' + shardState.rot.y + 'deg) ' +
+        'rotateZ(' + shardState.rot.z + 'deg)';
     }
   }
 
@@ -276,22 +276,22 @@ PlaneAnimation.Animation = (function() {
   }
 
   /**
-   * Create plane elements
+   * Create shard elements
    */
-  function createPlaneElements(wrapper, maxPlanes) {
-    var planes = [];
-    for (var i = 0; i < maxPlanes; i++) {
-      var plane = document.createElement('div');
-      plane.className = 'plane';
-      plane.style.position = 'absolute';
-      plane.style.left = '50%';
-      plane.style.top = '50%';
-      plane.style.transformStyle = 'preserve-3d';
-      plane.style.display = 'none';
-      wrapper.appendChild(plane);
-      planes.push(plane);
+  function createShardElements(wrapper, maxShards) {
+    var shards = [];
+    for (var i = 0; i < maxShards; i++) {
+      var shard = document.createElement('div');
+      shard.className = 'shard';
+      shard.style.position = 'absolute';
+      shard.style.left = '50%';
+      shard.style.top = '50%';
+      shard.style.transformStyle = 'preserve-3d';
+      shard.style.display = 'none';
+      wrapper.appendChild(shard);
+      shards.push(shard);
     }
-    return planes;
+    return shards;
   }
 
   // Public API
@@ -301,6 +301,6 @@ PlaneAnimation.Animation = (function() {
     updateAnimationDisplay: updateAnimationDisplay,
     startAnimation: startAnimation,
     stopAnimation: stopAnimation,
-    createPlaneElements: createPlaneElements
+    createShardElements: createShardElements
   };
 })();

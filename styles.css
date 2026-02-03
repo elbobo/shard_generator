@@ -219,33 +219,33 @@ input[type="color"] {
   margin-left: auto;
 }
 
-/* Plane Color Controls */
-.plane-color-item {
+/* Shard Color Controls */
+.shard-color-item {
   margin-bottom: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
 }
 
-.plane-color-row {
+.shard-color-row {
   display: flex;
   gap: 8px;
   margin-bottom: 6px;
   align-items: center;
 }
 
-.plane-color-label {
+.shard-color-label {
   font-size: 11px;
   width: 55px;
   flex-shrink: 0;
 }
 
-.plane-opacity-row {
+.shard-opacity-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.plane-opacity-row input[type="range"] {
+.shard-opacity-row input[type="range"] {
   flex: 1;
   height: 6px;
   margin-bottom: 0;
@@ -321,7 +321,7 @@ input[type="color"] {
   transform-style: preserve-3d;
 }
 
-.plane {
+.shard {
   position: absolute;
   transform-style: preserve-3d;
 }

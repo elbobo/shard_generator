@@ -1,23 +1,23 @@
 /**
- * Main entry point for the plane animation application
+ * Main entry point for the shard animation application
  */
 
-var PlaneAnimation = window.PlaneAnimation || {};
+var ShardAnimation = window.ShardAnimation || {};
 
-PlaneAnimation.Main = (function() {
-  var Utils = PlaneAnimation.Utils;
-  var Animation = PlaneAnimation.Animation;
-  var Controls = PlaneAnimation.Controls;
-  var Export = PlaneAnimation.Export;
+ShardAnimation.Main = (function() {
+  var Utils = ShardAnimation.Utils;
+  var Animation = ShardAnimation.Animation;
+  var Controls = ShardAnimation.Controls;
+  var Export = ShardAnimation.Export;
 
-  var MAX_PLANES = 20;
+  var MAX_SHARDS = 20;
 
   // Application state
   var state = {
     showControls: true,
-    numPlanes: 5,
-    planeColors: [],
-    planeOpacities: [],
+    numShards: 5,
+    shardColors: [],
+    shardOpacities: [],
     aspectRatio: '4:3',
     startStacked: true,
     stackGap: 25,
@@ -51,9 +51,9 @@ PlaneAnimation.Main = (function() {
   };
 
   // Initialize arrays
-  for (var i = 0; i < MAX_PLANES; i++) {
-    state.planeColors.push('#C50978');
-    state.planeOpacities.push(0.5);
+  for (var i = 0; i < MAX_SHARDS; i++) {
+    state.shardColors.push('#C50978');
+    state.shardOpacities.push(0.5);
   }
 
   var stateRef = { current: state };
@@ -62,8 +62,8 @@ PlaneAnimation.Main = (function() {
   var animationContainer;
   var stackWrapper;
   var perspectiveContainer;
-  var planeElements = [];
-  var planeTargets = [];
+  var shardElements = [];
+  var shardTargets = [];
 
   // Position grids
   var startPositionGrid;
@@ -77,8 +77,8 @@ PlaneAnimation.Main = (function() {
     stackWrapper = document.getElementById('stack-rotation-wrapper');
     perspectiveContainer = document.getElementById('perspective-container');
 
-    planeElements = Animation.createPlaneElements(stackWrapper, MAX_PLANES);
-    planeTargets = Utils.generatePlaneTargets(state);
+    shardElements = Animation.createShardElements(stackWrapper, MAX_SHARDS);
+    shardTargets = Utils.generateShardTargets(state);
 
     setupControls();
     setupEventListeners();
@@ -103,20 +103,20 @@ PlaneAnimation.Main = (function() {
       render();
     });
 
-    document.getElementById('num-planes').addEventListener('input', function(e) {
-      state.numPlanes = Math.max(1, Math.min(MAX_PLANES, Number(e.target.value)));
-      planeTargets = Utils.generatePlaneTargets(state);
-      updatePlaneColorControls();
+    document.getElementById('num-shards').addEventListener('input', function(e) {
+      state.numShards = Math.max(1, Math.min(MAX_SHARDS, Number(e.target.value)));
+      shardTargets = Utils.generateShardTargets(state);
+      updateShardColorControls();
       render();
     });
 
-    updatePlaneColorControls();
+    updateShardColorControls();
 
     startPositionGrid = Controls.createPositionGrid(
       document.getElementById('start-position-grid'),
       'Start Position',
       state.startPosition,
-      state.planeColors[0],
+      state.shardColors[0],
       function(pos) {
         state.startPosition = pos;
         render();
@@ -127,7 +127,7 @@ PlaneAnimation.Main = (function() {
       document.getElementById('end-position-grid'),
       'End Position',
       state.endPosition,
-      state.planeColors[0],
+      state.shardColors[0],
       function(pos) {
         state.endPosition = pos;
         render();
@@ -184,7 +184,7 @@ PlaneAnimation.Main = (function() {
 
     document.getElementById('randomize-start').addEventListener('click', function() {
       state.randomSeed = Date.now();
-      planeTargets = Utils.generatePlaneTargets(state);
+      shardTargets = Utils.generateShardTargets(state);
       render();
     });
 
@@ -244,7 +244,7 @@ PlaneAnimation.Main = (function() {
 
     document.getElementById('randomize-end').addEventListener('click', function() {
       state.randomSeed = Date.now();
-      planeTargets = Utils.generatePlaneTargets(state);
+      shardTargets = Utils.generateShardTargets(state);
       render();
     });
 
@@ -254,7 +254,7 @@ PlaneAnimation.Main = (function() {
       '',
       function(value) {
         state.positionalVariation = value;
-        planeTargets = Utils.generatePlaneTargets(state);
+        shardTargets = Utils.generateShardTargets(state);
         render();
       }
     );
@@ -265,14 +265,14 @@ PlaneAnimation.Main = (function() {
       '',
       function(value) {
         state.rotationVariation = value;
-        planeTargets = Utils.generatePlaneTargets(state);
+        shardTargets = Utils.generateShardTargets(state);
         render();
       }
     );
 
     document.getElementById('rotation-mode').addEventListener('change', function(e) {
       state.rotationMode = e.target.value;
-      planeTargets = Utils.generatePlaneTargets(state);
+      shardTargets = Utils.generateShardTargets(state);
       render();
     });
 
@@ -326,19 +326,19 @@ PlaneAnimation.Main = (function() {
   }
 
   /**
-   * Update plane color controls
+   * Update shard color controls
    */
-  function updatePlaneColorControls() {
-    var container = document.getElementById('plane-colors-container');
-    var colors = state.planeColors.slice(0, state.numPlanes);
-    var opacities = state.planeOpacities.slice(0, state.numPlanes);
+  function updateShardColorControls() {
+    var container = document.getElementById('shard-colors-container');
+    var colors = state.shardColors.slice(0, state.numShards);
+    var opacities = state.shardOpacities.slice(0, state.numShards);
 
-    Controls.createPlaneColorControls(
+    Controls.createShardColorControls(
       container,
       colors,
       opacities,
       function(index, color) {
-        state.planeColors[index] = color;
+        state.shardColors[index] = color;
         if (index === 0) {
           Controls.updatePrimaryColor(color);
           startPositionGrid.updateColor(color);
@@ -347,10 +347,10 @@ PlaneAnimation.Main = (function() {
         render();
       },
       function(index, opacity) {
-        state.planeOpacities[index] = opacity;
+        state.shardOpacities[index] = opacity;
         render();
       },
-      state.planeColors[0]
+      state.shardColors[0]
     );
   }
 
@@ -371,7 +371,7 @@ PlaneAnimation.Main = (function() {
    */
   function updateUI() {
     Controls.updateUIVisibility(state);
-    Controls.updatePrimaryColor(state.planeColors[0]);
+    Controls.updatePrimaryColor(state.shardColors[0]);
   }
 
   /**
@@ -417,7 +417,7 @@ PlaneAnimation.Main = (function() {
    * Render the animation
    */
   function render() {
-    Animation.updateAnimationDisplay(state, planeTargets, planeElements, stackWrapper);
+    Animation.updateAnimationDisplay(state, shardTargets, shardElements, stackWrapper);
   }
 
   // Initialize when DOM is ready

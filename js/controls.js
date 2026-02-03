@@ -1,10 +1,10 @@
 /**
- * UI Controls for the plane animation
+ * UI Controls for the shard animation
  */
 
-var PlaneAnimation = window.PlaneAnimation || {};
+var ShardAnimation = window.ShardAnimation || {};
 
-PlaneAnimation.Controls = (function() {
+ShardAnimation.Controls = (function() {
 
   /**
    * Create a position grid component
@@ -87,21 +87,21 @@ PlaneAnimation.Controls = (function() {
   }
 
   /**
-   * Create plane color controls
+   * Create shard color controls
    */
-  function createPlaneColorControls(container, colors, opacities, onColorChange, onOpacityChange, primaryColor) {
+  function createShardColorControls(container, colors, opacities, onColorChange, onOpacityChange, primaryColor) {
     container.innerHTML = '';
 
     colors.forEach(function(color, i) {
       var item = document.createElement('div');
-      item.className = 'plane-color-item';
+      item.className = 'shard-color-item';
 
       var colorRow = document.createElement('div');
-      colorRow.className = 'plane-color-row';
+      colorRow.className = 'shard-color-row';
 
       var label = document.createElement('span');
-      label.className = 'plane-color-label';
-      label.textContent = 'Plane ' + (i + 1) + ':';
+      label.className = 'shard-color-label';
+      label.textContent = 'Shard ' + (i + 1) + ':';
 
       var colorInput = document.createElement('input');
       colorInput.type = 'color';
@@ -139,7 +139,7 @@ PlaneAnimation.Controls = (function() {
       colorRow.appendChild(resetBtn);
 
       var opacityRow = document.createElement('div');
-      opacityRow.className = 'plane-opacity-row';
+      opacityRow.className = 'shard-opacity-row';
 
       opacityInput.addEventListener('input', function(e) {
         var value = Number(e.target.value);
@@ -157,7 +157,7 @@ PlaneAnimation.Controls = (function() {
 
     return {
       update: function(newColors, newOpacities, newPrimaryColor) {
-        createPlaneColorControls(container, newColors, newOpacities, onColorChange, onOpacityChange, newPrimaryColor);
+        createShardColorControls(container, newColors, newOpacities, onColorChange, onOpacityChange, newPrimaryColor);
       }
     };
   }
@@ -209,8 +209,8 @@ PlaneAnimation.Controls = (function() {
     var helperText = document.getElementById('positional-variation-helper');
     if (helperText) {
       helperText.textContent = state.startStacked
-        ? 'How much planes spread apart during journey'
-        : 'How much planes move around during journey';
+        ? 'How much shards spread apart during journey'
+        : 'How much shards move around during journey';
     }
   }
 
@@ -243,7 +243,7 @@ PlaneAnimation.Controls = (function() {
   // Public API
   return {
     createPositionGrid: createPositionGrid,
-    createPlaneColorControls: createPlaneColorControls,
+    createShardColorControls: createShardColorControls,
     bindSliderToValue: bindSliderToValue,
     updateUIVisibility: updateUIVisibility,
     toggleControlsPanel: toggleControlsPanel,

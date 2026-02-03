@@ -1,20 +1,20 @@
 /**
- * Export functionality for the plane animation
+ * Export functionality for the shard animation
  */
 
-var PlaneAnimation = window.PlaneAnimation || {};
+var ShardAnimation = window.ShardAnimation || {};
 
-PlaneAnimation.Export = (function() {
-  var Utils = PlaneAnimation.Utils;
-  var Animation = PlaneAnimation.Animation;
+ShardAnimation.Export = (function() {
+  var Utils = ShardAnimation.Utils;
+  var Animation = ShardAnimation.Animation;
 
   /**
    * Export animation as HTML file
    */
   function exportAsHTML(state) {
-    var numPlanes = state.numPlanes;
-    var planeColors = state.planeColors;
-    var planeOpacities = state.planeOpacities;
+    var numShards = state.numShards;
+    var shardColors = state.shardColors;
+    var shardOpacities = state.shardOpacities;
     var aspectRatio = state.aspectRatio;
     var startStacked = state.startStacked;
     var endStacked = state.endStacked;
@@ -34,7 +34,7 @@ PlaneAnimation.Export = (function() {
     var exportQuality = state.exportQuality;
     var containerDimensions = state.containerDimensions;
 
-    var planeTargets = Utils.generatePlaneTargets(state);
+    var shardTargets = Utils.generateShardTargets(state);
 
     var frameCount = {
       'low': 25,
@@ -48,29 +48,29 @@ PlaneAnimation.Export = (function() {
     for (var i = 0; i <= frameCount; i++) {
       var t = i / frameCount;
       var frameData = [];
-      for (var planeIndex = 0; planeIndex < numPlanes; planeIndex++) {
-        frameData.push(Animation.getStateAtProgress(t, planeIndex, state, planeTargets));
+      for (var shardIndex = 0; shardIndex < numShards; shardIndex++) {
+        frameData.push(Animation.getStateAtProgress(t, shardIndex, state, shardTargets));
       }
-      frames.push({ progress: t * 100, planes: frameData });
+      frames.push({ progress: t * 100, shards: frameData });
     }
 
     var keyframesCSS = '';
-    for (var planeIndex = 0; planeIndex < numPlanes; planeIndex++) {
-      keyframesCSS += '\n@keyframes plane' + planeIndex + 'Animation {';
+    for (var shardIndex = 0; shardIndex < numShards; shardIndex++) {
+      keyframesCSS += '\n@keyframes shard' + shardIndex + 'Animation {';
 
       frames.forEach(function(frame) {
-        var planeState = frame.planes[planeIndex];
-        var xVw = Utils.pxToPercent(planeState.pos.x, containerSize);
-        var yVw = Utils.pxToPercent(planeState.pos.y, containerSize);
-        var zVw = Utils.pxToPercent(planeState.pos.z, containerSize);
+        var shardState = frame.shards[shardIndex];
+        var xVw = Utils.pxToPercent(shardState.pos.x, containerSize);
+        var yVw = Utils.pxToPercent(shardState.pos.y, containerSize);
+        var zVw = Utils.pxToPercent(shardState.pos.z, containerSize);
 
         keyframesCSS += '\n  ' + frame.progress.toFixed(2) + '% {\n' +
           '    transform: translateX(' + xVw + 'vw)\n' +
           '               translateY(' + yVw + 'vw)\n' +
           '               translateZ(' + zVw + 'vw)\n' +
-          '               rotateX(' + planeState.rot.x.toFixed(2) + 'deg)\n' +
-          '               rotateY(' + planeState.rot.y.toFixed(2) + 'deg)\n' +
-          '               rotateZ(' + planeState.rot.z.toFixed(2) + 'deg);\n' +
+          '               rotateX(' + shardState.rot.x.toFixed(2) + 'deg)\n' +
+          '               rotateY(' + shardState.rot.y.toFixed(2) + 'deg)\n' +
+          '               rotateZ(' + shardState.rot.z.toFixed(2) + 'deg);\n' +
           '  }';
       });
 
@@ -83,20 +83,16 @@ PlaneAnimation.Export = (function() {
 
       frames.forEach(function(frame) {
         var t = frame.progress / 100;
-        var rotX, rotY, rotZ, centerZ;
+        var rotX, rotY, rotZ;
 
         if (returnToStart) {
           rotX = startRotationX;
           rotY = startRotationY;
           rotZ = startRotationZ;
-          centerZ = startStacked ? (numPlanes - 1) * stackGap / 2 : 0;
         } else {
           rotX = startRotationX + (endRotationX - startRotationX) * t;
           rotY = startRotationY + (endRotationY - startRotationY) * t;
           rotZ = startRotationZ + (endRotationZ - startRotationZ) * t;
-          var startCenterZ = startStacked ? (numPlanes - 1) * stackGap / 2 : 0;
-          var endCenterZ = (numPlanes - 1) * endStackGap / 2;
-          centerZ = startCenterZ + (endCenterZ - startCenterZ) * t;
         }
 
         var startPos = Utils.getPositionCoords(startPosition, containerDimensions);
@@ -135,22 +131,22 @@ PlaneAnimation.Export = (function() {
         '    animation-fill-mode: forwards;';
     }
 
-    var planeSize = (150 / containerSize * 100).toFixed(2);
-    var planeOffset = (planeSize / 2).toFixed(2);
+    var shardSize = (150 / containerSize * 100).toFixed(2);
+    var shardOffset = (shardSize / 2).toFixed(2);
 
-    var planeStyles = '';
-    for (var i = 0; i < numPlanes; i++) {
-      planeStyles += '\n    .plane-' + i + ' {\n' +
-        '      background: ' + planeColors[i] + ';\n' +
-        '      opacity: ' + planeOpacities[i] + ';\n' +
-        '      animation-name: plane' + i + 'Animation;\n' +
+    var shardStyles = '';
+    for (var i = 0; i < numShards; i++) {
+      shardStyles += '\n    .shard-' + i + ' {\n' +
+        '      background: ' + shardColors[i] + ';\n' +
+        '      opacity: ' + shardOpacities[i] + ';\n' +
+        '      animation-name: shard' + i + 'Animation;\n' +
         '      ' + animationProps + '\n' +
         '    }';
     }
 
-    var planeDivs = '';
-    for (var i = 0; i < numPlanes; i++) {
-      planeDivs += '      <div class="plane plane-' + i + '"></div>\n';
+    var shardDivs = '';
+    for (var i = 0; i < numShards; i++) {
+      shardDivs += '      <div class="shard shard-' + i + '"></div>\n';
     }
 
     var html = '<!DOCTYPE html>\n' +
@@ -158,7 +154,7 @@ PlaneAnimation.Export = (function() {
       '<head>\n' +
       '  <meta charset="UTF-8">\n' +
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-      '  <title>3D Plane Animation</title>\n' +
+      '  <title>3D Shard Animation</title>\n' +
       '  <style>\n' +
       '    * {\n' +
       '      margin: 0;\n' +
@@ -188,11 +184,11 @@ PlaneAnimation.Export = (function() {
       '      height: 100%;\n' +
       '      transform-style: preserve-3d;\n' +
       ((startStacked || (!returnToStart && endStacked)) ?
-        '      transform-origin: 50% 50% ' + ((numPlanes - 1) * stackGap / 2 / containerSize * 100).toFixed(2) + 'vw;\n' +
+        '      transform-origin: 50% 50% ' + ((numShards - 1) * stackGap / 2 / containerSize * 100).toFixed(2) + 'vw;\n' +
         '      animation-name: stackRotation;\n' +
         '      ' + animationProps + '\n' : '') +
       '    }\n\n' +
-      '    .background-plane {\n' +
+      '    .background-shard {\n' +
       '      position: absolute;\n' +
       '      width: 300%;\n' +
       '      height: 300%;\n' +
@@ -202,30 +198,30 @@ PlaneAnimation.Export = (function() {
       '      transform: translateZ(-1000vw);\n' +
       '      pointer-events: none;\n' +
       '    }\n\n' +
-      '    .plane {\n' +
+      '    .shard {\n' +
       '      position: absolute;\n' +
-      '      width: ' + planeSize + 'vw;\n' +
-      '      height: ' + planeSize + 'vw;\n' +
+      '      width: ' + shardSize + 'vw;\n' +
+      '      height: ' + shardSize + 'vw;\n' +
       '      left: 50%;\n' +
       '      top: 50%;\n' +
-      '      margin-left: -' + planeOffset + 'vw;\n' +
-      '      margin-top: -' + planeOffset + 'vw;\n' +
+      '      margin-left: -' + shardOffset + 'vw;\n' +
+      '      margin-top: -' + shardOffset + 'vw;\n' +
       '      transform-style: preserve-3d;\n' +
       '    }\n' +
-      keyframesCSS + stackRotationKeyframes + planeStyles + '\n' +
+      keyframesCSS + stackRotationKeyframes + shardStyles + '\n' +
       '  </style>\n' +
       '</head>\n' +
       '<body>\n' +
       '  <div class="animation-container">\n' +
-      '    <div class="background-plane"></div>\n' +
+      '    <div class="background-shard"></div>\n' +
       '    <div class="stack-rotation-wrapper">\n' +
-      planeDivs +
+      shardDivs +
       '    </div>\n' +
       '  </div>\n' +
       '</body>\n' +
       '</html>';
 
-    Utils.downloadFile(html, '3d-plane-animation.html', 'text/html');
+    Utils.downloadFile(html, '3d-shard-animation.html', 'text/html');
   }
 
   /**
@@ -258,7 +254,7 @@ PlaneAnimation.Export = (function() {
           }).then(function(dataUrl) {
             containerRef.style.background = originalBackground;
             containerRef.style.border = originalBorder;
-            Utils.downloadDataUrl(dataUrl, 'plane-animation-frame-' + state.exportResolution + '.png');
+            Utils.downloadDataUrl(dataUrl, 'shard-animation-frame-' + state.exportResolution + '.png');
             if (wasPlaying) setIsPlaying(true);
           }).catch(function(error) {
             console.error('Export failed:', error);

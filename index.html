@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Plane Animation</title>
+  <title>3D Shard Animation</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Load scripts in order - each adds to PlaneAnimation namespace -->
+  <!-- Load scripts in order - each adds to ShardAnimation namespace -->
   <script src="js/utils.js"></script>
   <script src="js/animation.js"></script>
   <script src="js/controls.js"></script>
@@ -33,11 +33,11 @@
         <option value="9:16">9:16 (Vertical)</option>
       </select>
 
-      <label class="control-label">Number of Planes</label>
-      <input type="number" id="num-planes" min="1" max="20" value="5">
+      <label class="control-label">Number of Shards</label>
+      <input type="number" id="num-shards" min="1" max="20" value="5">
 
-      <label class="control-label">Plane Colors & Opacity</label>
-      <div id="plane-colors-container"></div>
+      <label class="control-label">Shard Colors & Opacity</label>
+      <div id="shard-colors-container"></div>
     </div>
 
     <!-- Start Settings -->
@@ -53,7 +53,7 @@
 
       <div id="start-stacked-options">
         <label class="control-label">Start Stack Gap: <span id="stack-gap-value">25</span>px</label>
-        <div class="helper-text">Distance between stacked planes</div>
+        <div class="helper-text">Distance between stacked shards</div>
         <input type="range" id="stack-gap" min="0" max="50" value="25">
 
         <label class="control-label">Start Stack Rotation X: <span id="start-rotation-x-value">45</span>°</label>
@@ -68,11 +68,11 @@
 
       <div id="start-unstacked-options" style="display: none;">
         <label class="control-label">Start Spread: <span id="start-spread-value">50</span>%</label>
-        <div class="helper-text">How far apart planes are scattered within region</div>
+        <div class="helper-text">How far apart shards are scattered within region</div>
         <input type="range" id="start-spread" min="0" max="100" value="50">
 
         <label class="control-label">Start Initial Rotation: <span id="start-rotation-amount-value">0</span>%</label>
-        <div class="helper-text">How much each plane is randomly rotated at start</div>
+        <div class="helper-text">How much each shard is randomly rotated at start</div>
         <input type="range" id="start-rotation-amount" min="0" max="100" value="0">
 
         <button id="randomize-start" class="primary-button">Randomize Within Region</button>
@@ -98,7 +98,7 @@
 
         <div id="end-stacked-options">
           <label class="control-label">End Stack Gap: <span id="end-stack-gap-value">25</span>px</label>
-          <div class="helper-text">Distance between stacked planes at end</div>
+          <div class="helper-text">Distance between stacked shards at end</div>
           <input type="range" id="end-stack-gap" min="0" max="50" value="25">
 
           <label class="control-label">End Stack Rotation X: <span id="end-rotation-x-value">45</span>°</label>
@@ -113,11 +113,11 @@
 
         <div id="end-unstacked-options" style="display: none;">
           <label class="control-label">End Spread: <span id="end-spread-value">50</span>%</label>
-          <div class="helper-text">How far apart planes are scattered within end region</div>
+          <div class="helper-text">How far apart shards are scattered within end region</div>
           <input type="range" id="end-spread" min="0" max="100" value="50">
 
           <label class="control-label">End Initial Rotation: <span id="end-rotation-amount-value">0</span>%</label>
-          <div class="helper-text">How much each plane is randomly rotated at end</div>
+          <div class="helper-text">How much each shard is randomly rotated at end</div>
           <input type="range" id="end-rotation-amount" min="0" max="100" value="0">
 
           <button id="randomize-end" class="primary-button">Randomize Within Region</button>
@@ -130,17 +130,17 @@
       <h3>Movement & Rotation Settings</h3>
 
       <label class="control-label">Positional Variation: <span id="positional-variation-value">100</span>%</label>
-      <div class="helper-text" id="positional-variation-helper">How much planes spread apart during journey</div>
+      <div class="helper-text" id="positional-variation-helper">How much shards spread apart during journey</div>
       <input type="range" id="positional-variation" min="0" max="150" value="100">
 
       <label class="control-label">Rotation Variation: <span id="rotation-variation-value">50</span>%</label>
-      <div class="helper-text">How much planes rotate during journey</div>
+      <div class="helper-text">How much shards rotate during journey</div>
       <input type="range" id="rotation-variation" min="0" max="100" value="50">
 
       <label class="control-label">Rotation Mode</label>
       <select id="rotation-mode">
-        <option value="different">Each plane rotates differently</option>
-        <option value="synchronized">All planes rotate synchronized</option>
+        <option value="different">Each shard rotates differently</option>
+        <option value="synchronized">All shards rotate synchronized</option>
       </select>
     </div>
 
@@ -199,7 +199,7 @@
   <div id="perspective-container" class="perspective-container">
     <div id="animation-container" class="animation-container">
       <div id="stack-rotation-wrapper" class="stack-rotation-wrapper">
-        <!-- Planes will be dynamically inserted here -->
+        <!-- Shards will be dynamically inserted here -->
       </div>
     </div>
   </div>
