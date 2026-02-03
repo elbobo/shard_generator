@@ -303,6 +303,10 @@ ShardAnimation.Main = (function() {
       Export.exportCurrentFrame(state, animationContainer, setIsPlaying);
     });
 
+    document.getElementById('export-svg').addEventListener('click', function() {
+      Export.exportAsSVG(state);
+    });
+
     document.getElementById('play-pause').addEventListener('click', function() {
       setIsPlaying(!state.isPlaying);
     });

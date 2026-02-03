@@ -279,9 +279,119 @@ ShardAnimation.Export = (function() {
     }
   }
 
+  /**
+   * Export current frame as SVG (editable vector)
+   */
+  function exportAsSVG(state) {
+    var numShards = state.numShards;
+    var shardColors = state.shardColors;
+    var shardOpacities = state.shardOpacities;
+    var containerDimensions = state.containerDimensions;
+    var progress = state.progress;
+
+    var shardSize = containerDimensions.width * 0.1875;
+
+    // Generate shard targets
+    var shardTargets = Utils.generateShardTargets(state);
+
+    // Calculate wrapper transform values (must match CSS exactly)
+    var wrapperTransform = { x: 0, y: 0, rotX: 0, rotY: 0, rotZ: 0, originZ: 0 };
+
+    var startStacked = state.startStacked;
+    var endStacked = state.endStacked;
+    var returnToStart = state.returnToStart;
+    var numShards = state.numShards;
+
+    // Calculate transform-origin Z (center of stack)
+    if (returnToStart) {
+      wrapperTransform.originZ = startStacked ? (numShards - 1) * state.stackGap / 2 : 0;
+    } else {
+      var startOriginZ = startStacked ? (numShards - 1) * state.stackGap / 2 : 0;
+      var endOriginZ = endStacked ? (numShards - 1) * state.endStackGap / 2 : 0;
+      wrapperTransform.originZ = startOriginZ + (endOriginZ - startOriginZ) * progress;
+    }
+
+    if (startStacked || (!returnToStart && endStacked)) {
+      var startPos = Utils.getPositionCoords(state.startPosition, containerDimensions);
+      var endPos = returnToStart ? startPos : Utils.getPositionCoords(state.endPosition, containerDimensions);
+      wrapperTransform.x = startPos.x + (endPos.x - startPos.x) * progress;
+      wrapperTransform.y = startPos.y + (endPos.y - startPos.y) * progress;
+    }
+
+    if (returnToStart) {
+      if (startStacked) {
+        wrapperTransform.rotX = state.startRotationX;
+        wrapperTransform.rotY = state.startRotationY;
+        wrapperTransform.rotZ = state.startRotationZ;
+      }
+    } else {
+      if (startStacked || endStacked) {
+        wrapperTransform.rotX = state.startRotationX + (state.endRotationX - state.startRotationX) * progress;
+        wrapperTransform.rotY = state.startRotationY + (state.endRotationY - state.startRotationY) * progress;
+        wrapperTransform.rotZ = state.startRotationZ + (state.endRotationZ - state.startRotationZ) * progress;
+      }
+    }
+
+    // Calculate 2D projections for each shard
+    var shardData = [];
+    for (var i = 0; i < numShards; i++) {
+      var shardState = Animation.getStateAtProgress(progress, i, state, shardTargets);
+      var projection = Utils.getShardCorners2D(
+        shardState,
+        wrapperTransform,
+        shardSize,
+        containerDimensions
+      );
+
+      shardData.push({
+        corners: projection.corners,
+        avgZ: projection.avgZ,
+        color: shardColors[i],
+        opacity: shardOpacities[i]
+      });
+    }
+
+    // Sort by z-depth (back to front - lower z values drawn first)
+    shardData.sort(function(a, b) {
+      return a.avgZ - b.avgZ;
+    });
+
+    // Generate SVG
+    var width = containerDimensions.width;
+    var height = containerDimensions.height;
+
+    var svgParts = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '">',
+      '  <title>3D Shard Animation Frame</title>',
+      '  <desc>Generated shard animation frame with ' + numShards + ' shards</desc>',
+      ''
+    ];
+
+    // Add each shard as a polygon
+    shardData.forEach(function(shard, index) {
+      var points = shard.corners.map(function(c) {
+        return c.x.toFixed(2) + ',' + c.y.toFixed(2);
+      }).join(' ');
+
+      svgParts.push('  <polygon');
+      svgParts.push('    points="' + points + '"');
+      svgParts.push('    fill="' + shard.color + '"');
+      svgParts.push('    fill-opacity="' + shard.opacity + '"');
+      svgParts.push('    stroke="none"');
+      svgParts.push('  />');
+    });
+
+    svgParts.push('</svg>');
+
+    var svgContent = svgParts.join('\n');
+    Utils.downloadFile(svgContent, 'shard-animation-frame.svg', 'image/svg+xml');
+  }
+
   // Public API
   return {
     exportAsHTML: exportAsHTML,
-    exportCurrentFrame: exportCurrentFrame
+    exportCurrentFrame: exportCurrentFrame,
+    exportAsSVG: exportAsSVG
   };
 })();

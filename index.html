@@ -178,10 +178,10 @@
         <button id="export-html" class="primary-button">Export as HTML</button>
       </div>
 
-      <div class="export-subsection no-border">
+      <div class="export-subsection">
         <h4>Export Static Image</h4>
 
-        <label class="control-label">Image Resolution</label>
+        <label class="control-label">PNG Resolution</label>
         <div class="helper-text">Higher resolution = better quality, larger file</div>
         <select id="export-resolution">
           <option value="1x">1× Standard</option>
@@ -190,7 +190,13 @@
           <option value="4x">4× Maximum</option>
         </select>
 
-        <button id="export-png" class="primary-button">Export Current Frame (PNG)</button>
+        <button id="export-png" class="primary-button">Export PNG</button>
+      </div>
+
+      <div class="export-subsection no-border">
+        <h4>Export Vector</h4>
+        <div class="helper-text">Editable in Illustrator, Figma, Inkscape</div>
+        <button id="export-svg" class="primary-button">Export SVG</button>
       </div>
     </div>
   </div>

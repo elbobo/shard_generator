@@ -160,6 +160,150 @@ ShardAnimation.Utils = (function() {
     });
   }
 
+  /**
+   * Apply a single axis rotation to a point
+   */
+  function rotateX(point, angleDeg) {
+    var rad = angleDeg * Math.PI / 180;
+    var cos = Math.cos(rad);
+    var sin = Math.sin(rad);
+    return {
+      x: point.x,
+      y: point.y * cos - point.z * sin,
+      z: point.y * sin + point.z * cos
+    };
+  }
+
+  function rotateY(point, angleDeg) {
+    var rad = angleDeg * Math.PI / 180;
+    var cos = Math.cos(rad);
+    var sin = Math.sin(rad);
+    return {
+      x: point.x * cos + point.z * sin,
+      y: point.y,
+      z: -point.x * sin + point.z * cos
+    };
+  }
+
+  function rotateZ(point, angleDeg) {
+    var rad = angleDeg * Math.PI / 180;
+    var cos = Math.cos(rad);
+    var sin = Math.sin(rad);
+    return {
+      x: point.x * cos - point.y * sin,
+      y: point.x * sin + point.y * cos,
+      z: point.z
+    };
+  }
+
+  /**
+   * Apply CSS-style rotation (rotateX, then rotateY, then rotateZ)
+   * CSS applies transforms right-to-left, so rotateX(a) rotateY(b) rotateZ(c)
+   * means: first Z, then Y, then X
+   */
+  function applyRotation(point, rx, ry, rz) {
+    // CSS transform order: operations are applied right to left
+    // So "rotateX(rx) rotateY(ry) rotateZ(rz)" applies Z first, then Y, then X
+    var p = rotateZ(point, rz);
+    p = rotateY(p, ry);
+    p = rotateX(p, rx);
+    return p;
+  }
+
+  /**
+   * Project 3D point to 2D using orthographic projection
+   * Simply drops the z-coordinate and offsets to SVG coordinates
+   */
+  function projectTo2D(point, centerX, centerY) {
+    return {
+      x: point.x + centerX,
+      y: point.y + centerY,
+      z: point.z
+    };
+  }
+
+  /**
+   * Get the 4 corners of a shard transformed to 2D screen coordinates
+   * Uses orthographic projection (no perspective distortion)
+   */
+  function getShardCorners2D(shardState, wrapperTransform, shardSize, containerDimensions) {
+    var halfSize = shardSize / 2;
+    var centerX = containerDimensions.width / 2;
+    var centerY = containerDimensions.height / 2;
+
+    // Define the 4 corners of the shard (centered at origin)
+    var corners = [
+      { x: -halfSize, y: -halfSize, z: 0 }, // top-left
+      { x: halfSize, y: -halfSize, z: 0 },  // top-right
+      { x: halfSize, y: halfSize, z: 0 },   // bottom-right
+      { x: -halfSize, y: halfSize, z: 0 }   // bottom-left
+    ];
+
+    // Transform each corner
+    corners = corners.map(function(corner) {
+      var p = corner;
+
+      // Step 1: Apply shard's own transform
+      // CSS: translateX(x) translateY(y) translateZ(z) rotateX(rx) rotateY(ry) rotateZ(rz)
+      // Applied right-to-left: rotation first, then translation
+
+      // Apply shard rotation (around shard's own center, which is origin)
+      p = applyRotation(p, shardState.rot.x, shardState.rot.y, shardState.rot.z);
+
+      // Apply shard translation
+      p = {
+        x: p.x + shardState.pos.x,
+        y: p.y + shardState.pos.y,
+        z: p.z + shardState.pos.z
+      };
+
+      // Step 2: Apply wrapper transform
+      // The wrapper has transform-origin at (0, 0, originZ) relative to container center
+      // CSS: translateX(x) translateY(y) rotateX(rx) rotateY(ry) rotateZ(rz)
+
+      if (wrapperTransform.rotX !== 0 || wrapperTransform.rotY !== 0 || wrapperTransform.rotZ !== 0) {
+        // Shift to wrapper's transform origin (which is at z = originZ)
+        p = {
+          x: p.x,
+          y: p.y,
+          z: p.z - wrapperTransform.originZ
+        };
+
+        // Apply wrapper rotation
+        p = applyRotation(p, wrapperTransform.rotX, wrapperTransform.rotY, wrapperTransform.rotZ);
+
+        // Shift back from transform origin
+        p = {
+          x: p.x,
+          y: p.y,
+          z: p.z + wrapperTransform.originZ
+        };
+      }
+
+      // Apply wrapper translation
+      p = {
+        x: p.x + wrapperTransform.x,
+        y: p.y + wrapperTransform.y,
+        z: p.z
+      };
+
+      return p;
+    });
+
+    // Calculate average z for depth sorting (use z after all transforms but before projection)
+    var avgZ = corners.reduce(function(sum, c) { return sum + c.z; }, 0) / 4;
+
+    // Step 3: Project to 2D (orthographic)
+    var corners2D = corners.map(function(corner) {
+      return projectTo2D(corner, centerX, centerY);
+    });
+
+    return {
+      corners: corners2D,
+      avgZ: avgZ
+    };
+  }
+
   // Public API
   return {
     seededRandom: seededRandom,
@@ -169,6 +313,7 @@ ShardAnimation.Utils = (function() {
     pxToPercent: pxToPercent,
     downloadFile: downloadFile,
     downloadDataUrl: downloadDataUrl,
-    loadScript: loadScript
+    loadScript: loadScript,
+    getShardCorners2D: getShardCorners2D
   };
 })();
